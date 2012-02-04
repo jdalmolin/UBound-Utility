@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using LINQtoCSV;
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Keyword_CSVParse
 {
@@ -37,73 +39,26 @@ namespace Keyword_CSVParse
                 IEnumerable<Keywords> keysRead = cc.Read<Keywords>(filename, inputFileDescript);
                 
                 // order the data how we want it
-                var query = from x in keysRead
-                            orderby x.AdGroup
-                            select new { x.Name, x.AdGroup };
-
-                // if we got any results - lets do this thang
-                if (query.Any())
-                {
-                    // be unsafe and CLOBBER the file
-                    var output = File.CreateText(args[1]);
-
-                    // predicate for setting the propper quote pattern
-					Boolean groupFirst = false;
+            	var GroupQuery = (from x in keysRead
+                            select  x.AdGroup)
+							.Distinct()
+							.OrderBy(x => x);
+				
+				
+				foreach(var group in GroupQuery)
+				{
+					JObject kjs =
+						new JObject(
+							new JProperty(@group,
+							new JArray(
+							from x in keysRead
+								where x.AdGroup == @group
+								select new JValue(x.Name)
+							)));
+					Console.WriteLine(kjs.ToString());
+				}
 					
-					// allocate a string to hold the ADGroup Title
-                    string group = string.Empty;
-					
-					// Notify the user that we are processing x entries
-					Console.WriteLine("Processing " + query.Count() + " records....");
-                    for (int i = 0; i < query.Count(); i++)
-                    {
-                        // assign and sanitize the keyword string
-                        string word = query.ElementAt(i).Name.ToString();
-                        word = word.Replace("{ Name =", "");
-                        word = word.Replace("}", "");
-                        word = word.Replace("[", "");
-                        word = word.Replace("]", "");
-                        
-                        // Detect if we need to be part of a sub group
-                        if (group != query.ElementAt(i).AdGroup.ToString())
-                        {
-							group = query.ElementAt(i).AdGroup.ToString();
-							if (i != 0) 
-							{
-								output.WriteLine("]} \n\n{ \"" + group + "\" : [");
-								groupFirst = true;
-							} 
-							else
-							{
-								output.WriteLine("{ \"" + group + "\" : [");	
-								groupFirst = true;
-							}
-                            
-                            
-                        };
-                        
-                        // add the item to the group
-						if (word != string.Empty)
-						{
-							if (groupFirst)
-							{
-								output.Write("\"" + word + "\"");
-								groupFirst = false;
-							}
-							else
-							{
-                        		output.Write(", \"" + word + "\"");
-							}
-						}
-
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No results found while parsing CSV file");
-                    return;
-                }
-
+				
             }
             else
             {
