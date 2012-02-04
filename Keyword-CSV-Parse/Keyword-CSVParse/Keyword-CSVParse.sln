@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keyword-CSVParse", "Keyword-CSVParse.csproj", "{BF9308F7-3003-43C1-A02E-17CA92539925}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF9308F7-3003-43C1-A02E-17CA92539925}.Debug|x86.ActiveCfg = Debug|x86
+		{BF9308F7-3003-43C1-A02E-17CA92539925}.Debug|x86.Build.0 = Debug|x86
+		{BF9308F7-3003-43C1-A02E-17CA92539925}.Release|x86.ActiveCfg = Release|x86
+		{BF9308F7-3003-43C1-A02E-17CA92539925}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
