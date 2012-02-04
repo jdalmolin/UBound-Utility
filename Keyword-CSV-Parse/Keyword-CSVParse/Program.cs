@@ -11,8 +11,11 @@ namespace Keyword_CSVParse
     {
         static void Main(string[] args)
         {
-            if (File.Exists(args[0]))
+            if(args.Length > 1)
             {
+
+                if (!File.Exists(args[0]))
+                { Console.WriteLine("Cannot locate the file " + args[0]);  return; }
                 
                 //Cache the argument as a string type
                 string filename = args[0].ToString();
@@ -28,13 +31,20 @@ namespace Keyword_CSVParse
 
                 // Load the CSV file into a query'able list
                 IEnumerable<Keywords> keysRead = cc.Read<Keywords>(filename, inputFileDescript);
-
+                
+                // order the data how we want it
                 var query = from x in keysRead
                             orderby x.AdGroup
                             select new { x.Name, x.AdGroup };
 
+                // if we got any results - lets do this thang
                 if (query.Any())
                 {
+                    // be unsafe and CLOBBER the file
+                    var output = File.CreateText(args[1]);
+
+                    
+
                     string group = string.Empty;
                     foreach (var keyword in query)
                     {
@@ -49,19 +59,13 @@ namespace Keyword_CSVParse
                         if (group != keyword.AdGroup.ToString())
                         {
                             group = keyword.AdGroup.ToString();
-                            Console.WriteLine("]} \n{ \"" + group + "\" : \"[");
+                            output.WriteLine("]} \n\n{ \"" + group + "\" : [");
                         };
                         
                         // add the item to the group
-                        Console.Write(word + ",");
-                        
-
-
+                        output.WriteLine("\"" + word + "\",");
 
                         //Console.WriteLine("{\"" + word + "\" : \"" +  group + "\"}"); -- cool testing worked
-
-
-
                     }
                 }
                 else
@@ -73,7 +77,7 @@ namespace Keyword_CSVParse
             }
             else
             {
-                Console.WriteLine("No file exists in the current path.\n Usage: Keyword_CSVParse.exe filename");
+                Console.WriteLine("No file exists in the current path.\n Usage: Keyword_CSVParse.exe input_filename output_filename");
                 return;
             }
 
