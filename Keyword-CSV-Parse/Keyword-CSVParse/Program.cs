@@ -11,6 +11,10 @@ namespace Keyword_CSVParse
     {
         static void Main(string[] args)
         {
+			args = new string[2];
+			args[0] = "biz.csv";
+			args[1] = "out.js";
+			
             if(args.Length > 1)
             {
 
@@ -43,29 +47,55 @@ namespace Keyword_CSVParse
                     // be unsafe and CLOBBER the file
                     var output = File.CreateText(args[1]);
 
-                    
-
+                    // predicate for setting the propper quote pattern
+					Boolean groupFirst = false;
+					
+					// allocate a string to hold the ADGroup Title
                     string group = string.Empty;
-                    foreach (var keyword in query)
+					
+					// Notify the user that we are processing x entries
+					Console.WriteLine("Processing " + query.Count() + " records....");
+                    for (int i = 0; i < query.Count(); i++)
                     {
                         // assign and sanitize the keyword string
-                        string word = keyword.Name.ToString();
+                        string word = query.ElementAt(i).Name.ToString();
                         word = word.Replace("{ Name =", "");
                         word = word.Replace("}", "");
                         word = word.Replace("[", "");
                         word = word.Replace("]", "");
                         
                         // Detect if we need to be part of a sub group
-                        if (group != keyword.AdGroup.ToString())
+                        if (group != query.ElementAt(i).AdGroup.ToString())
                         {
-                            group = keyword.AdGroup.ToString();
-                            output.WriteLine("]} \n\n{ \"" + group + "\" : [");
+							group = query.ElementAt(i).AdGroup.ToString();
+							if (i != 0) 
+							{
+								output.WriteLine("]} \n\n{ \"" + group + "\" : [");
+								groupFirst = true;
+							} 
+							else
+							{
+								output.WriteLine("{ \"" + group + "\" : [");	
+								groupFirst = true;
+							}
+                            
+                            
                         };
                         
                         // add the item to the group
-                        output.WriteLine("\"" + word + "\",");
+						if (word != string.Empty)
+						{
+							if (groupFirst)
+							{
+								output.Write("\"" + word + "\"");
+								groupFirst = false;
+							}
+							else
+							{
+                        		output.Write(", \"" + word + "\"");
+							}
+						}
 
-                        //Console.WriteLine("{\"" + word + "\" : \"" +  group + "\"}"); -- cool testing worked
                     }
                 }
                 else
@@ -82,7 +112,7 @@ namespace Keyword_CSVParse
             }
 
 
-
+			Console.WriteLine("Proessing Complete");
         }
     }
 
