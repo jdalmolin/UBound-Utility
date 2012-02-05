@@ -13,19 +13,12 @@ namespace Keyword_CSVParse
     {
         static void Main(string[] args)
         {
-			args = new string[2];
-			args[0] = "biz.csv";
-			args[1] = "out.js";
-			
             if(args.Length > 1)
             {
 
                 if (!File.Exists(args[0]))
                 { Console.WriteLine("Cannot locate the file " + args[0]);  return; }
-                
-                //Cache the argument as a string type
-                string filename = args[0].ToString();
-                
+				
                 // We will assume for now that they will always pass in a , separated list. not a | or whatever else.
                 CsvFileDescription inputFileDescript = new CsvFileDescription
                 {
@@ -36,15 +29,21 @@ namespace Keyword_CSVParse
                 CsvContext cc = new CsvContext();
 
                 // Load the CSV file into a query'able list
-                IEnumerable<Keywords> keysRead = cc.Read<Keywords>(filename, inputFileDescript);
+                IEnumerable<Keywords> keysRead = cc.Read<Keywords>(args[0], inputFileDescript);
                 
-                // order the data how we want it
+                // order the data how we want it, nix the dupes
             	var GroupQuery = (from x in keysRead
                             select  x.AdGroup)
 							.Distinct()
 							.OrderBy(x => x);
 				
+				//Create a file object to store the output in
+				var output = File.CreateText(args[1]);
 				
+				
+				// Iterate through the ordered query - using the groups we scraped
+				// and build an object for each group - then write it to the file
+				// in proper JSON format
 				foreach(var group in GroupQuery)
 				{
 					JObject kjs =
@@ -55,9 +54,12 @@ namespace Keyword_CSVParse
 								where x.AdGroup == @group
 								select new JValue(x.Name)
 							)));
-					Console.WriteLine(kjs.ToString());
+					// Save the file.
+					output.WriteLine(kjs.ToString());
 				}
-					
+				
+				// close the file
+				output.Close();
 				
             }
             else
@@ -67,7 +69,7 @@ namespace Keyword_CSVParse
             }
 
 
-			Console.WriteLine("Proessing Complete");
+			Console.WriteLine("Done!");
         }
     }
 
