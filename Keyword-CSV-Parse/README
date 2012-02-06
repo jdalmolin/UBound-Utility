@@ -1,0 +1,5 @@
+a Mono / .Net C# reader of CSV exports with 2 columns, Keyword and Ad Group.
+
+It requires 2 command line parameters. the CSV File and the Output .js - it will build (currently broken... but close enough) JSON file for use elsewhere.
+
+This convertor is provided AS IS without any implied warranty under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
